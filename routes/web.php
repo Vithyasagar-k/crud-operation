@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProductController;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,8 +17,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('create');
 });
+
+Route::get('/list', function () {
+
+    $product = Product::all();
+
+    return view(
+        'list',
+        [
+            'product' => $product,
+        ]
+    );
+})->name('list.product');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -28,4 +42,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::controller(ProductController::class)->group(function () {
+    Route::post('/product-store', 'store')->name('product.store');
+    Route::get('/product/edit/{id}', 'productEdit')->name('product.edit');
+    Route::post('/product/update{id}', 'update')->name('product.update');
+    Route::get('/product/delete/{id}', 'destroy')->name('product.destroy');
+
+});
+
+require __DIR__ . '/auth.php';
